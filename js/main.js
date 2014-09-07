@@ -12,7 +12,7 @@ function midiMessageReceived( ev ) {
 	}
 	else if (cmd == 9) {
 		// note on
-		noteOn( noteNumber, velocity/127.0);
+		noteOn( noteNumber );
 	}
 }
 
@@ -20,6 +20,7 @@ var midiIn = null;
 var buffers = new Array();
 var images = new Array();
 var started = false;
+
 var sounds = [
 'Letters/B.webm',
 'Letters/E.webm',
@@ -104,9 +105,6 @@ var noteMap = {
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
 var context = new AudioContext();
 
-function playSound(bufferIndex) {
-}
-
 function getSound(index) {
 	var request = new XMLHttpRequest();
 	request.open('GET', sounds[index], true);
@@ -150,7 +148,7 @@ function onMIDISystemError( err ) {
 	console.log( "MIDI not initialized - error encountered:" + err.code );
 }
 
-function noteOn( noteNumber, velocity ) {
+function noteOn( noteNumber ) {
 	if (noteNumber == 72) {
 		playVideo();
 	}
@@ -162,9 +160,7 @@ function noteOn( noteNumber, velocity ) {
 			document.getElementById('main').src = images[m[1][0]].src;
 			started = true;
 			source.start(0);
-		//window.setTimeout(function () { document.getElementById('main').src = defaultImage }, 750);
 			eval('source.onended = function () { if (started) { var im = ' + m[1][1] + '; if (im != null) { document.getElementById(\'main\').src = images[im].src;} } started = false; }');
-		//source.onended = function () { document.getElementById('main').src = defaultImage };
 		}
 		else {
 			console.log(noteNumber);
@@ -175,7 +171,6 @@ function noteOn( noteNumber, velocity ) {
 function noteOff( noteNumber ) {
 }
 
-//init: start up MIDI
 window.addEventListener('load', function() {   
 	if (navigator.requestMIDIAccess)
 		navigator.requestMIDIAccess().then( onMIDIStarted, onMIDISystemError );
